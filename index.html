@@ -13,13 +13,14 @@
             Speed:
             <input
                 type="range"
-                oninput="ticksPerFrame = Math.round(Number(this.value) ** 2)"
+                oninput="ticksPerFrame = Math.ceil(Number(this.value) ** 2)"
                 step="0.1"
                 min="0"
                 max="10"
                 value="1"
             />
-            <span id="speedLabel">1x</span>
+            <span id="speedLabel"></span><br />
+            <span id="scoreLabel"></span>
         </div>
 
         <script src="bird.js"></script>

@@ -22,7 +22,7 @@ class Bird {
     collidesWith(pipe) {
         if (!pipe) return;
         const radiusHalf = this.radius / 2;
-        const atPipe = this.x + radiusHalf > pipe.x && this.x - radiusHalf < pipe.x + pipe.width;
+        const atPipe = this.x + radiusHalf > pipe.x;
         const yIsInside = this.y + radiusHalf > pipe.bottomY || this.y - radiusHalf < pipe.topY;
         return atPipe && yIsInside;
     }

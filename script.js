@@ -7,6 +7,7 @@ let tickCount = 0;
 let ticksPerFrame = 1;
 
 const speedLabel = document.getElementById("speedLabel");
+const scoreLabel = document.getElementById("scoreLabel");
 
 function setup() {
     createCanvas(innerWidth, innerHeight);
@@ -17,11 +18,6 @@ function setup() {
 
 function draw() {
     for (let i = 0; i < ticksPerFrame; i++) {
-        bird.update();
-        if (bird.outsideBounds() || bird.collidesWith(pipes[0])) {
-            return reset();
-        }
-
         for (let i = pipes.length - 1; i >= 0; i--) {
             const pipe = pipes[i];
             pipe.update();
@@ -34,6 +30,14 @@ function draw() {
             pipes.push(new Pipe());
         }
 
+        const incomingPipe =
+            bird.x - bird.radius / 2 < pipes[0].x + pipes[0].width ? pipes[0] : pipes[1];
+        if (bird.outsideBounds() || bird.collidesWith(incomingPipe)) {
+            reset();
+            break;
+        }
+
+        bird.update();
         tickCount += 1;
     }
 
@@ -44,12 +48,14 @@ function draw() {
     bird.draw();
 
     speedLabel.textContent = `${ticksPerFrame}x`;
+    scoreLabel.textContent = `Score: ${tickCount}`;
 }
 
 function reset() {
     pipes = [];
     tickCount = 0;
     bird = new Bird();
+    score = 0;
 }
 
 function keyPressed() {
