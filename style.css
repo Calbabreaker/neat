@@ -1,0 +1,19 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow: hidden;
+    color: white;
+}
+
+.controls {
+    position: fixed;
+    padding: 0.5rem;
+    user-select: none;
+}
+
+input {
+    vertical-align: middle;
+}
