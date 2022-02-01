@@ -4,10 +4,11 @@ class Bird {
         this.y = height / 2;
         this.velocity = 0;
         this.radius = birdSize / 2;
+        this.brain = new Network();
     }
 
     update() {
-        this.velocity += gravity;
+        // this.velocity += gravity;
         this.y += this.velocity;
     }
 
