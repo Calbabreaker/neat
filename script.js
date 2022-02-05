@@ -3,16 +3,20 @@ let gravity;
 let pipes = [];
 
 let birdSize;
+let birdRadius;
 let tickCount = 0;
 let ticksPerFrame = 1;
+let score = 0;
 
 const speedLabel = document.getElementById("speedLabel");
 const scoreLabel = document.getElementById("scoreLabel");
+const fitnessLabel = document.getElementById("fitnessLabel");
 
 function setup() {
     createCanvas(innerWidth, innerHeight);
-    birdSize = height / 8;
-    gravity = birdSize / 128;
+    birdSize = height / 16;
+    birdRadius = birdSize / 2;
+    gravity = birdSize / 64;
     bird = new Bird();
 }
 
@@ -23,18 +27,21 @@ function draw() {
             pipe.update();
             if (pipe.x < -pipe.width) {
                 pipes.splice(i, 1);
+                score++;
             }
         }
 
-        if (tickCount % 80 == 0) {
+        if (tickCount % 40 == 0) {
             pipes.push(new Pipe());
         }
 
-        const incomingPipe =
-            bird.x - bird.radius / 2 < pipes[0].x + pipes[0].width ? pipes[0] : pipes[1];
-        if (bird.outsideBounds() || bird.collidesWith(incomingPipe)) {
-            reset();
-            break;
+        if (pipes.length !== 0) {
+            const incomingPipe =
+                bird.x - birdRadius < pipes[0].x + pipes[0].width ? pipes[0] : pipes[1];
+            if (bird.outsideBounds() || bird.collidesWith(incomingPipe)) {
+                reset();
+                break;
+            }
         }
 
         bird.update();
@@ -48,7 +55,8 @@ function draw() {
     bird.draw();
 
     speedLabel.textContent = `${ticksPerFrame}x`;
-    scoreLabel.textContent = `Score: ${tickCount}`;
+    scoreLabel.textContent = `Score: ${score}`;
+    fitnessLabel.textContent = `Fitness: ${tickCount}`;
 }
 
 function reset() {

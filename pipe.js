@@ -1,15 +1,15 @@
 class Pipe {
     constructor() {
-        let pipeSep = birdSize * 1.2;
+        let pipeSep = birdSize * 2.5;
         this.x = width;
         this.y = random(pipeSep, height - pipeSep);
         this.bottomY = this.y + pipeSep;
         this.topY = this.y - pipeSep;
-        this.width = birdSize * 1.1;
+        this.width = birdSize * 2;
     }
 
     update() {
-        this.x -= birdSize / 16;
+        this.x -= birdSize / 6;
     }
 
     draw() {

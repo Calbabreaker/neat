@@ -3,33 +3,35 @@ class Bird {
         this.x = birdSize * 2;
         this.y = height / 2;
         this.velocity = 0;
-        this.radius = birdSize / 2;
-        this.brain = new Network();
+        this.terminalVelocity = birdSize / 3;
     }
 
     update() {
-        // this.velocity += gravity;
+        this.velocity += gravity;
+        if (this.velocity > this.terminalVelocity) {
+            this.velocity = this.terminalVelocity;
+        }
+
         this.y += this.velocity;
     }
 
     jump() {
-        this.velocity = -birdSize / 7;
+        this.velocity = -birdSize / 3.7;
     }
 
     outsideBounds() {
-        return this.y + this.radius / 2 > height || this.y < this.radius / 2;
+        return this.y + birdRadius > height || this.y < birdRadius;
     }
 
     collidesWith(pipe) {
         if (!pipe) return;
-        const radiusHalf = this.radius / 2;
-        const atPipe = this.x + radiusHalf > pipe.x;
-        const yIsInside = this.y + radiusHalf > pipe.bottomY || this.y - radiusHalf < pipe.topY;
+        const atPipe = this.x + birdRadius > pipe.x;
+        const yIsInside = this.y + birdRadius > pipe.bottomY || this.y - birdRadius < pipe.topY;
         return atPipe && yIsInside;
     }
 
     draw() {
         fill(255, 255, 0);
-        ellipse(this.x, this.y, this.radius);
+        ellipse(this.x, this.y, birdSize);
     }
 }

@@ -10,17 +10,20 @@
     </head>
     <body>
         <div class="controls">
-            Speed:
-            <input
-                type="range"
-                oninput="ticksPerFrame = Math.ceil(Number(this.value) ** 2)"
-                step="0.1"
-                min="0"
-                max="10"
-                value="1"
-            />
-            <span id="speedLabel"></span><br />
-            <span id="scoreLabel"></span>
+            <div>
+                Speed:
+                <input
+                    type="range"
+                    oninput="ticksPerFrame = Math.ceil(Number(this.value) ** 2)"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    value="1"
+                />
+                <span id="speedLabel"></span>
+            </div>
+            <p id="scoreLabel"></p>
+            <p id="fitnessLabel"></p>
         </div>
 
         <script src="neat.js"></script>
