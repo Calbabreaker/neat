@@ -31,7 +31,7 @@ function draw() {
             }
         }
 
-        if (tickCount % 40 == 0) {
+        if (tickCount % 50 == 0) {
             pipes.push(new Pipe());
         }
 

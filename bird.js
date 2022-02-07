@@ -4,6 +4,7 @@ class Bird {
         this.y = height / 2;
         this.velocity = 0;
         this.terminalVelocity = birdSize / 3;
+        this.brain = new Network();
     }
 
     update() {
@@ -33,5 +34,12 @@ class Bird {
     draw() {
         fill(255, 255, 0);
         ellipse(this.x, this.y, birdSize);
+    }
+
+    drawBrain(x, y, w, h) {
+        fill(255);
+        this.brain.nodes.forEach((node) => {
+            ellipse();
+        });
     }
 }

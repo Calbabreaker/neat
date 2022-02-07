@@ -2,8 +2,12 @@ function sigmoid(x) {
     return 1 / (1 + Math.exp(-x));
 }
 
+function randInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
 function getRandom(array) {
-    return array[Math.floor(Math.random() * array.length)];
+    return array[randInt(array.length)];
 }
 
 class Connection {
@@ -20,7 +24,7 @@ class Counter {
     counter = 0;
 
     count() {
-        return ++counter;
+        return counter++;
     }
 }
 
@@ -40,7 +44,9 @@ class Node {
         this.inputSum = 0; // reset inputSum for next feed forward
 
         node.outputConnections.forEach((connection) => {
-            connection.outNode.inputSum += nodeValue * connection.weight;
+            if (connection.enabled) {
+                connection.outNode.inputSum += nodeValue * connection.weight;
+            }
         });
     }
 
@@ -50,68 +56,93 @@ class Node {
 }
 
 class Network {
-    nodes = [];
+    // 2d array of layers of nodes
+    nodeLayers = [];
     connections = [];
 
     constructor(inputCount, outputCount) {
         this.connections = [];
-        this.inputCount = inputCount;
 
-        for (let i = 0; i < inputCount; i++) {
-            this.nodes.push(new Node(0));
-        }
-
-        for (let i = 0; i < outputCount; i++) {
-            this.nodes.push(new Node(1));
-        }
-
+        this.nodeLayers.push(new Array(inputCount).fill().map(() => new Node(0)));
+        this.nodeLayers.push(new Array(outputCount).fill().map(() => new Node(1)));
         // bias node maybe
     }
 
     feedForward(inputValues) {
-        if (inputValues.length != this.inputCount) {
-            throw new Error(`Expected inputs to be of length ${this.inputCount}`);
+        if (inputValues.length != this.nodeLayers[0].length) {
+            throw new Error(`Expected inputs to be of length ${this.nodeLayers[0].length}`);
         }
 
         inputValues.forEach((value, i) => {
-            this.nodes[i].inputSum = value;
+            this.nodeLayers[0][i].inputSum = value;
         });
 
-        this.nodes.forEach((node) => {
-            node.passOnSum();
+        this.nodeLayers.forEach((layer) => {
+            layer.forEach((node) => {
+                node.passOnSum();
+            });
         });
 
-        const outputNodes = this.nodes.slice(-this.outputCount);
-        return outputNodes.map((node) => node.outputValue);
+        return this.nodeLayers.at(-1).map((node) => node.outputValue);
+    }
+
+    // // Crossovers this network with another parent creating a new child assumming `this` is the more fit parent
+    // crossover(otherParent) {
+    //     const child = new Network(this.inputCount, this.outputCount);
+    // }
+
+    mutate() {
+        this.mutateAddConnection();
     }
 
     // Adds a connection bewtween two random unconnected nodes
-    mutateAddConnection(innovationCount) {
-        // only allow 500 tries
-        for (let i = 0; i < 500; i++) {
-            let node1 = getRandom(this.nodes);
-            let node2 = getRandom(this.nodes);
+    mutateAddConnection(innovationCounter) {
+        // only allow 100 tries
+        for (let i = 0; i < 100; i++) {
+            const layerIndex1 = randInt(this.nodeLayers.length);
+            const layerIndex2 = randInt(this.nodeLayers.length);
+            // can't be same layer
+            if (layerIndex1 === layerIndex2) {
+                continue;
+            }
+
+            let node1 = getRandom(this.nodeLayers[layerIndex1]);
+            let node2 = getRandom(this.nodeLayers[layerIndex2]);
 
             // swap if node 1 is at higher layer
-            if (node1.layer > node2.layer) {
+            if (layerIndex1 > layerIndex2) {
                 [node1, node2] = [node2, node1];
             }
 
-            if (node1.layer === node2.layer && node1.connectedToNode(node2)) {
-                // incompatible node try again
+            if (node1.connectedToNode(node2)) {
                 continue;
             }
 
             const weight = Math.random() * 2 - 1; // -1 to 1
-            const connection = new Connection(node1, node2, weight, innovationCount.count());
+            const connection = new Connection(node1, node2, weight, innovationCounter.count());
             this.connections.push(connection);
-            node.outputConnections.push(connection);
+            node1.outputConnections.push(connection);
             break;
         }
     }
 
     // Adds a node in the middle of a prexisting connection creating two new connections
-    mutateAddNode(innovationCount) {
-        const connection = getRandom(this.connections);
+    mutateAddNode(innovationCounter) {
+        const oldConnection = getRandom(this.connections);
+        oldConnection.enabled = false;
+
+        const newNode = new Node();
+        this.connections.push(
+            new Connection(oldConnection.inNode, newNode, 1, innovationCounter.count())
+        );
+        this.connections.push(
+            // prettier-ignore
+            new Connection(newNode, oldConnection.outNode, oldConnection.weight, innovationCounter.count())
+        );
+
+        // create a new layer if new node's layer is the same is the output node's layer
+        if (newNode.layer === oldConnection.outNode.layer) {
+            this;
+        }
     }
 }
